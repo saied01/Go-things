@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"
+    integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ"
+    crossorigin="anonymous"></script>
+  <title>GoCulate</title>
+</head>
+
+<body>
+  <main>
+    <form id="calc-form">
+      <input type="number" name="x">
+      <input type="number" name="y">
+      <button hx-post="/add" hx-target="#result" hx-swap="innerHTML" hx-include="#calc-form" type="button">+</button>
+      <button hx-post="/sub" hx-target="#result" hx-swap="innerHTML" hx-include="#calc-form" type="button">-</button>
+      <button hx-post="/mult" hx-target="#result" hx-swap="innerHTML" hx-include="#calc-form" type="button">*</button>
+      <button hx-post="/div" hx-target="#result" hx-swap="innerHTML" hx-include="#calc-form" type="button">/</button>
+    </form>
+
+    <div id="result">
+    </div>
+  </main>
+</body>
+
+</html>
