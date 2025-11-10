@@ -4,12 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
+
+var maxId = 0
+
+func getTasksFilePath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	dir := filepath.Join(home, ".tasks")
+	os.MkdirAll(dir, os.ModePerm)
+	return filepath.Join(dir, "tasks.json")
+}
 
 var rootCmd = &cobra.Command{
 	Use:   "tasks",
@@ -41,11 +54,20 @@ var completeCmd = &cobra.Command{
 	},
 }
 
+var removeCmd = &cobra.Command{
+	Use:   "remove",
+	Short: "Remove task from list",
+	Run: func(cmd *cobra.Command, args []string) {
+		removeTask(args)
+	},
+}
+
 func Execute() {
 	// add commands
 	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(completeCmd)
+	rootCmd.AddCommand(removeCmd)
 
 	// add command flags
 	listCmd.Flags().BoolP("all", "a", false, "List all tasks (including completed ones)")
@@ -53,8 +75,45 @@ func Execute() {
 	rootCmd.Execute()
 }
 
+func removeTask(task []string) {
+
+	filename := getTasksFilePath()
+
+	var tasks []Task
+	fileData, err := os.ReadFile(filename)
+	if err == nil && len(fileData) > 0 {
+		json.Unmarshal(fileData, &tasks)
+	}
+
+	removeId, err := strconv.Atoi(task[0])
+	if err != nil {
+		fmt.Println("Error converting ID:", err)
+	}
+
+	var newTasks []Task
+	for _, t := range tasks {
+		if t.ID == removeId {
+			continue
+		}
+		newTasks = append(newTasks, t)
+	}
+
+	data, err := json.MarshalIndent(newTasks, "", " ")
+	if err != nil {
+		fmt.Println("Error serializing json:", err)
+		return
+	}
+
+	if err := os.WriteFile(filename, data, 0644); err != nil {
+		fmt.Println("Error writing file:", err)
+		return
+	}
+
+	fmt.Printf("removed task %d", removeId)
+}
+
 func completeTask(task []string) {
-	filename := "tasks.json"
+	filename := getTasksFilePath()
 
 	var tasks []Task
 	fileData, err := os.ReadFile(filename)
@@ -90,7 +149,9 @@ func completeTask(task []string) {
 
 func listTasks(showAll bool) {
 
-	file, err := os.Open("tasks.json")
+	filename := getTasksFilePath()
+
+	file, err := os.Open(filename)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return
@@ -121,9 +182,9 @@ func listTasks(showAll bool) {
 
 func addTask(taskContent []string) {
 
-	var maxId int = 0
+	maxId = 0
 
-	filename := "tasks.json"
+	filename := getTasksFilePath()
 
 	// Abrir o crear el archivo (modo escritura)
 	var tasks []Task
@@ -133,7 +194,7 @@ func addTask(taskContent []string) {
 	}
 
 	for _, t := range tasks {
-		if t.ID > maxId {
+		if t.ID >= maxId {
 			maxId = t.ID + 1
 		}
 	}
