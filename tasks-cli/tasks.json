@@ -1,0 +1,26 @@
+[
+ {
+  "id": 1,
+  "content": "learn rust",
+  "done": false,
+  "created": "2025-11-09T21:31:31.221865129-03:00"
+ },
+ {
+  "id": 1,
+  "content": "learn rust",
+  "done": false,
+  "created": "2025-11-09T21:36:53.184894266-03:00"
+ },
+ {
+  "id": 1,
+  "content": "xd",
+  "done": false,
+  "created": "2025-11-09T21:36:57.063841856-03:00"
+ },
+ {
+  "id": 2,
+  "content": "xd",
+  "done": true,
+  "created": "2025-11-09T21:38:35.196850574-03:00"
+ }
+]
